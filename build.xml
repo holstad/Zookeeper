@@ -1,0 +1,278 @@
+<?xml version="1.0"?>
+
+<!--
+  ~ Copyright (c) 2009 Concurrent, Inc.
+  ~
+  ~ This work has been released into the public domain
+  ~ by the copyright holder. This applies worldwide.
+  ~
+  ~ In case this is not legally possible:
+  ~ The copyright holder grants any entity the right
+  ~ to use this work for any purpose, without any
+  ~ conditions, unless such conditions are required by law.
+  -->
+
+<project name="stykeeper" default="build" basedir=".">
+
+  <!-- load properties first -->
+  <!--<property file="${user.home}/${name}.build.properties" />-->
+  <!--<property file="${root}/build.properties" />-->
+
+	<!--property name="homedir" location="."/-->
+	
+	<!--property name="project.home" location="${homedir}/cascading.hbase"/-->
+	
+  <!-- these are optional, only used if you uncomment the project.class.path filesets below -->
+  <!--property name="hadoop.home" location="${homedir}/hadoop"/>
+  <property name="hadoop.lib" location="${hadoop.home}/lib"/>
+  <echo message="hadoop.home ${hadoop.home}"/>
+
+  <property name="hbase.home" location="${homedir}/hbase"/>
+  <property name="hbase.lib" location="${hbase.home}/lib"/>
+  <property name="hbase.build" location="${hbase.home}/build"/-->
+	
+  <!-- assumes Cascading shares the same parent directory, change if necessary -->
+  <!--property name="stykeeper.home" location="${homedir}/stykeeper"/-->
+  <echo message="stykeeper.home ${basedir}"/>
+  <property file="${stykeeper.home}/version.properties"/>
+  <property name="stykeeper.release.version" value="x.y.z"/>
+  <property name="stykeeper.filename.core" value="stykeeper-core-${stykeeper.release.version}.jar"/>
+  <property name="stykeeper.filename.test" value="stykeeper-core-${stykeeper.release.version}.jar"/>
+  <!--property name="cascading.filename.xml" value="cascading-xml-${cascading.release.version}.jar"/-->
+  <!--property name="stykeeper.libs" value="${stykeeper.home}/lib"/-->
+  <!--property name="cascading.libs.core" value="${cascading.libs}"/>
+  <property name="cascading.libs.xml" value="${cascading.libs}/xml"/-->
+
+  <condition property="stykeeper.path" value="${stykeeper.home}/"
+             else="${stykeeper.home}/build">
+    <available file="${stykeeper.home}/${stykeeper.filename.core}"/>
+  </condition>
+
+	<!-- Cascading.hbase -->
+  <!--property name="cascading.hbase.home"
+  	location="${homedir}/${cascading.hbase}"/-->
+  <!--echo message="cascading.hbase.home ${project.home}"/>
+  <property name="cascading.hbase.lib" location="${project.home}/lib"/>
+	<echo message="cascading.hbase.home.lib ${cascading.hbase.lib}"/-->
+	
+  <!--property name="cascading.lib.core" value="${cascading.path}/${cascading.filename.core}"/>
+  <property name="cascading.lib.xml" value="${cascading.path}/${cascading.filename.xml}"/-->
+	<property name="cascading.lib.core" value="${cascading.path}${cascading.filename.core}"/>
+  <property name="cascading.lib.xml"  value="${cascading.path}${cascading.filename.xml}"/>
+
+  <property name="src.dir" location="${basedir}/src/java"/>
+  <property name="src.test" location="${basedir}/src/test"/>
+
+  <available file="${src.dir}" type="dir" property="main.available"/>
+  <available file="${src.test}" type="dir" property="test.available"/>
+
+  <property name="conf.dir" location="${hadoop.home}/conf"/>
+
+  <property name="lib.dir" location="${basedir}/lib"/>
+  
+  <property name="build.dir" location="${basedir}/build/"/>
+  <property name="build.classes" location="${build.dir}/classes"/>
+  <property name="build.test" location="${build.dir}/test"/>
+
+  <property name="test.results" location="${build.dir}/results"/>
+
+  <property name="dist" location="dist"/>
+
+  <path id="project.class.path">
+    <pathelement location="${build.classes}"/>
+    <pathelement location="${build.test}"/>
+    <pathelement location="${cascading.lib.core}"/>
+    <pathelement location="${cascading.lib.xml}"/>
+
+
+    <!--<fileset dir="${lib.dir}">-->
+      <!--<include name="*.jar"/>-->
+    <!--</fileset>-->
+
+    <fileset dir="${lib.dir}">
+      <include name="*.jar"/>
+    </fileset>
+
+    <!--fileset dir="${hadoop.home}">
+      <include name="*.jar"/>
+    </fileset>
+
+    <fileset dir="${hadoop.home}/build" erroronmissingdir="false">
+      <include name="*.jar"/>
+    </fileset>
+
+    <fileset dir="${hadoop.lib}">
+      <include name="**/*.jar"/>
+    </fileset>
+
+    <fileset dir="${hbase.home}">
+      <include name="*.jar"/>
+    </fileset>
+
+    <fileset dir="${hbase.home}/build" erroronmissingdir="false">
+      <include name="*.jar"/>
+    </fileset>
+
+    <fileset dir="${hbase.lib}">
+      <include name="**/*.jar"/>
+    </fileset>
+  	
+    <fileset dir="${cascading.libs}">
+      <include name="**/*.jar"/>
+    </fileset>
+
+    <fileset dir="${cascading.home}/build">
+      <include name="**/*.jar"/>
+    </fileset-->
+  	
+  </path>
+
+	
+  <!-- Targets -->
+	
+	<target name="clean" description="cleans all old stuff">
+    <echo message="cleaning..."/>
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist}"/>
+    <delete dir="${ant.project.name}.tgz"/>
+  </target>
+
+  <target name="build">
+    <echo message="building..."/>
+    <echo message="using stykeeper lib: ${stykeeper.lib.core}"/>
+    <mkdir dir="${build.classes}"/>
+    <mkdir dir="${build.test}"/>
+    <!--mkdir dir="${lib.dir}"/-->
+
+    <javac srcdir="${src.dir}" destdir="${build.classes}" verbose="off">
+      <classpath refid="project.class.path"/>
+    </javac>
+
+    <copy todir="${build.classes}">
+      <fileset dir="${src.dir}">
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+
+    <javac srcdir="${src.test}" destdir="${build.test}" verbose="off">
+      <classpath refid="project.class.path"/>
+    </javac>
+
+    <copy todir="${build.test}">
+      <fileset dir="${src.test}">
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+
+    <!-- Copy all dependecy jars to lib directory -->
+    <!--copy todir="${cascading.hbase.lib}"-->
+      <!-- HBase -->
+       <!--fileset dir="${hbase.build}">
+         <include name="*.jar"/>
+       </fileset--> 
+   	
+    	
+      <!-- Cascading -->
+      <!--fileset dir="${cascading.home}/build">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${cascading.libs}">
+        <include name="*.jar"/>
+      </fileset>
+    </copy-->
+  	
+      <!-- Cascading.hbase -->
+      <!--fileset dir="${cascading.hbase.home}/build">
+        <include name="*.jar"/>
+      </fileset-->
+
+    <!-- Hadoop supports jars in a lib directory -->
+    <!--copy todir="${build.classes}/lib">
+      <fileset dir="${lib.dir}">
+        <include name="*.jar"/>
+      </fileset>
+    </copy-->
+
+  	
+  </target>
+
+  <target name="jar" depends="build" description="creates module jar">
+    <jar jarfile="${build.dir}/${ant.project.name}.jar">
+      <fileset dir="${build.classes}"/>
+    </jar>
+  </target>
+
+  <!--target name="dist" depends="clean" description="packages current project">
+    <mkdir dir="${dist}"/>
+    <copy todir="${dist}">
+      <fileset dir=".">
+        <include name="data/**"/>
+        <include name="src/**"/>
+        <include name="lib/**"/>
+        <include name="build.xml"/>
+        <include name="README.txt"/>
+      </fileset>
+    </copy>
+  </target-->
+
+  <!--target name="tar" depends="dist" description="creates an archive of current project">
+    <tar destfile="${ant.project.name}.tgz"
+         compression="gzip">
+      <tarfileset dir="dist/" prefix="${ant.project.name}">
+        <include name="**/**"/>
+      </tarfileset>
+    </tar>
+  </target-->
+	
+  <target name="test-jar" depends="build" description="creates module test-jar"> 
+    <jar jarfile="${build.dir}/${ant.project.name}-test.jar" >
+      <fileset dir="${build.test}"/>
+    	<fileset dir="${build.classes}" />
+      <fileset dir="${src.test}" includes="**/*.properties" />
+      <!--fileset dir="${lib.dir}">
+        <include name="*.jar"/>
+      </fileset-->
+      <manifest>
+        <!--attribute name="Class-Path" value=". ./lib/log4j.jar"/-->
+        <attribute name="Main-Class" value="sty/ClientTester"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!--target name="test" depends="build" description="Run tests">
+    <echo message="running all tests..."/>
+
+    <mkdir dir="${test.results}"/>
+    <mkdir dir="build/test/log"/>
+
+    <junit printsummary="true" showoutput="${test.showoutput}" fork="yes" haltonerror="no" haltonfailure="no" dir="."
+           maxmemory="756m">
+
+      <sysproperty key="test.cluster.enabled" value="${test.cluster.enabled}"/>
+      <sysproperty key="test.build.data" value="data"/>
+      <sysproperty key="hadoop.log.dir" value="build/test/log"/-->
+
+      <!--<jvmarg value="-Xdebug"/>--><!--<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"/>-->
+
+      <!--classpath>
+        <path refid="project.class.path"/>
+        <pathelement path="${java.class.path}"/>
+      </classpath>
+      <formatter type="plain" usefile="true"/>
+
+      <test name="${testcase}" todir="${test.results}" if="testcase" haltonfailure="${test.haltonerror}"/>
+      <batchtest todir="${test.results}" haltonfailure="${test.haltonerror}" unless="testcase">
+        <fileset dir="${src.test}">
+          <include name="**/*Test.java"/>
+        </fileset>
+        <fileset dir="${hbase.home}/conf">
+          <include name="hbase-site.xml"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+  </target-->
+
+
+</project>
+
